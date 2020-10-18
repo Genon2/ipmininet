@@ -16,7 +16,7 @@ class MyTopology(IPTopo):
         asia_h1 = self.addHost("asia_h1")
 
         # Building New York routers
-        nwk_1, nwk_5  = self.addRouter("nwk_1", "nwk_5")
+        nwk_1, nwk_5  = self.addRouters("nwk_1", "nwk_5")
         # Building Bhs routers
         bhs_g1, bhs_g2 = self.addRouters("bhs_g1", "bhs_g2")
         # Building Chicago routers
@@ -27,35 +27,6 @@ class MyTopology(IPTopo):
         europe = self.addRouter("europe")
         # Building asia's routers abstractly
         asia = self.addRouter("asia")
-
-        # Adding Links between all routers
-        self.addLink(nwk_1,  nwk_5,  igp_metric=1)
-        self.addLink(bhs_g1, bhs_g2, igp_metric=1)
-        self.addLink(ash_1,  ash_5,  igp_metric=1)
-        self.addLink(chi_1,  chi_5,  igp_metric=1)
-
-        self.addLink(nwk_1,  bhs_g1, igp_metric=1)
-        self.addLink(nwk_1,  ash_1,  igp_metric=1)
-        self.addLink(nwk_5,  bhs_g2, igp_metric=1)
-        self.addLink(nwk_5,  ash_5,  igp_metric=1)
-
-        self.addLink(chi_1,  bhs_g1, igp_metric=3)
-        self.addLink(chi_1,  ash_1,  igp_metric=3)
-        self.addLink(chi_5,  bhs_g2, igp_metric=3)
-        self.addLink(chi_5,  ash_5,  igp_metric=3)
-
-        # Connecting US TO EU
-        self.addLink(nwk_1,  europe, igp_metric=30)
-        self.addLink(nwk_5,  europe, igp_metric=30)
-
-        # Connection EU to AS
-        self.addLink(europe, asia,   igp_metric=40)
-
-        # Connecting US to AS
-        self.addLink(asia,   ash_1,  igp_metric=50)
-        self.addLink(asia,   ash_5,  igp_metric=50)
-        
-      
 
         # adding OSPF6 as IGP
         nwk_1.addDaemon(OSPF6)
@@ -79,6 +50,38 @@ class MyTopology(IPTopo):
         ash_5.addDaemon(BGP)
         europe.addDaemon(BGP)
         asia.addDaemon(BGP)
+
+        # Adding Links between all routers
+        self.addLink(nwk_1,  nwk_5,  igp_cost=1)
+        self.addLink(bhs_g1, bhs_g2, igp_cost=1)
+        self.addLink(ash_1,  ash_5,  igp_cost=1)
+        self.addLink(chi_1,  chi_5,  igp_cost=1)
+
+        self.addLink(nwk_1,  bhs_g1, igp_cost=1)
+        self.addLink(nwk_1,  ash_1,  igp_cost=1)
+        self.addLink(nwk_5,  bhs_g2, igp_cost=1)
+        self.addLink(nwk_5,  ash_5,  igp_cost=1)
+
+        self.addLink(chi_1,  bhs_g1, igp_cost=3)
+        self.addLink(chi_1,  ash_1,  igp_cost=3)
+        self.addLink(chi_5,  bhs_g2, igp_cost=3)
+        self.addLink(chi_5,  ash_5,  igp_cost=3)
+
+        # Connecting US TO EU
+        self.addLink(nwk_1,  europe, igp_cost=30)
+        self.addLink(nwk_5,  europe, igp_cost=30)
+
+        # Connection EU to AS
+        self.addLink(europe, asia,   igp_cost=40)
+
+        # Connecting US to AS
+        self.addLink(asia,   ash_1,  igp_cost=50)
+        self.addLink(asia,   ash_5,  igp_cost=50)
+        
+        self.addLink(europe,europe_h1)
+        self.addLink(asia_h1,asia)
+
+        
         
         self.addAS(16276, (nwk_1,nwk_5,bhs_g1,bhs_g2,chi_1,chi_5,ash_1,ash_5,europe,asia))
         
