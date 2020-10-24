@@ -12,12 +12,35 @@ class MyTopology(IPTopo):
     def build(self, *args, **kwargs):
         
         # Adding stubs to AS2 and building AS2 routers
-        as2_chi_1_charter = self.addHost("charter1")
-        as2_ash_1_charter = self.addHost("charter2")
-        as2_ash_1_amazon = self.addHost("amazon1")
-        as2_ash_5_amazon = self.addHost("amazon2")
+        as2_chi_1_charter = self.addHost("charter_1")
+        as2_ash_1_charter = self.addHost("charter_2")
+        as2_ash_1_amazon = self.addHost("amazon_1")
+        as2_ash_5_amazon = self.addHost("amazon_2")
         # Two routers needed to build an AS
         as2_r1 = self.addRouter("as2_r1")
+
+        # Adding transits
+
+        as2_nwk_1_level3 = self.addHost("level3_1")
+        as2_nwk_5_level3 = self.addHost("level3_2")
+        as2_chi_1_level3 = self.addHost("level3_3")
+        as2_chi_5_level3 = self.addHost("level3_4")
+
+        as2_nwk_1_cogent = self.addHost("cogent_1")
+        as2_nwk_5_cogent = self.addHost("cogent_2")
+        as2_chi_1_cogent = self.addHost("cogent_3")
+        as2_chi_5_cogent = self.addHost("cogent_4")
+        as2_ash_1_cogent = self.addHost("cogent_5")
+        as2_ash_5_cogent = self.addHost("cogent_6")
+        
+        as2_nwk_1_telia = self.addHost("telia_1")
+        as2_nwk_5_telia = self.addHost("telia_2")
+        as2_chi_5_telia = self.addHost("telia_3")
+        as2_ash_5_telia = self.addHost("telia_4")
+
+        
+
+        # Used to create an AS. Otherwise useless
         as2_r2 = self.addRouter("as2_r2")
         
 
@@ -82,9 +105,12 @@ class MyTopology(IPTopo):
         self.addLink(asia,   ash_5,  igp_cost=50)
         
         # Linking router AS2 to OVH routers
-        self.addLink(chi_1, as2_r1)
-        self.addLink(ash_1, as2_r1)
-        self.addLink(ash_5, as2_r1)
+        self.addLink(as2_r1, chi_1)
+        self.addLink(as2_r1, chi_5)
+        self.addLink(as2_r1, ash_1)
+        self.addLink(as2_r1, ash_5)
+        self.addLink(as2_r1, nwk_1)
+        self.addLink(as2_r1, nwk_5)
         # Linking AS2 stubs to as2 routers
         self.addLink(as2_r1, as2_r2)
         self.addLink(as2_ash_1_amazon, as2_r1)
@@ -92,15 +118,32 @@ class MyTopology(IPTopo):
         self.addLink(as2_ash_5_amazon, as2_r1)
         self.addLink(as2_ash_1_charter, as2_r1)
         self.addLink(as1_host, nwk_1)
+        # Linking AS2 transit to as2 routers
+        self.addLink(as2_nwk_1_telia, as2_r1)
+        self.addLink(as2_nwk_5_telia, as2_r1)
+        self.addLink(as2_chi_5_telia, as2_r1)
+        self.addLink(as2_ash_5_telia, as2_r1)
+        
+        self.addLink(as2_nwk_1_level3,as2_r1)
+        self.addLink(as2_nwk_5_level3,as2_r1)
+        self.addLink(as2_chi_1_level3,as2_r1)
+        self.addLink(as2_chi_5_level3,as2_r1)
+
+        self.addLink(as2_nwk_1_cogent, as2_r1)
+        self.addLink(as2_nwk_5_cogent, as2_r1)
+        self.addLink(as2_chi_1_cogent, as2_r1)
+        self.addLink(as2_chi_5_cogent, as2_r1)
+        self.addLink(as2_ash_1_cogent, as2_r1)
+        self.addLink(as2_ash_5_cogent, as2_r1)
+        
 
         # Setting up OVH Network Route Reflectors
         set_rr(self, rr=nwk_1, peers=[nwk_5,bhs_g1,bhs_g2,chi_1,chi_5,ash_1,ash_5,europe,asia])
         set_rr(self, rr=chi_1, peers=[nwk_1,nwk_5,bhs_g1,bhs_g2,chi_5,ash_1,ash_5,europe,asia])
 
         # Adding eBGP sessions between AS2 and OVH Network
-        ebgp_session(self, as2_r1, chi_1)
-        ebgp_session(self, as2_r1,ash_1)
-        ebgp_session(self, as2_r1,ash_5)
+        ebgp_session(self, as2_r1, chi_1, link_type=SHARE)
+        ebgp_session(self, as2_r1, nwk_1, link_type=SHARE)
 
         super().build(*args, **kwargs)
 
