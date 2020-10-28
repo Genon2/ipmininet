@@ -77,6 +77,66 @@ class MyTopology(IPTopo):
         set_rr(self, rr=chi_1, peers=[
                nwk_1, nwk_5, bhs_g1, bhs_g2, chi_5, ash_1, ash_5, europe, asia])
 
+
+        #############################################################
+        #                                                           #
+        #              STUB                                         #
+        #                                                           #
+        #############################################################
+
+        # Building AS16509 (AMAZON) , routers and links
+        as16509_ash_1_amazon = self.addHost("amazon_1")
+        as16509_ash_5_amazon = self.addHost("amazon_2")
+        as16509_r1, as16509_r2 = self.addRouters("as16509_r1", "as16509_r2")
+        # Linking AS16509 (AMAZON) to its router
+        self.addLink(as16509_ash_1_amazon, as16509_r1)
+        self.addLink(as16509_ash_5_amazon, as16509_r1)
+        self.addLink(as16509_r1, as16509_r2)
+        as16509_r1.addDaemon(OSPF6)
+        as16509_r1.addDaemon(BGP)
+        as16509_r2.addDaemon(OSPF6)
+        as16509_r2.addDaemon(BGP)
+        self.addAS(16509, (as16509_r1, as16509_r2))
+        # Building physical links between AS16509 (AMAZON) and OVH
+        self.addLink(as16509_r1, ash_1)
+        self.addLink(as16509_r1, ash_5)
+        self.addLink(as16509_r2, ash_1)
+        self.addLink(as16509_r2, ash_5)
+        ebgp_session(self, as16509_r1, ash_1, link_type=SHARE)
+        #ebgp_session(self, as16509_r1, ash_5, link_type=SHARE)
+        ebgp_session(self, as16509_r2, ash_1, link_type=SHARE)
+        #ebgp_session(self, as16509_r2, ash_5, link_type=SHARE)
+
+
+        # Building as7843 (CHARTER) , routers and links
+        as7843_chi_1_charter = self.addHost("charter_1")
+        as7843_ash_1_charter = self.addHost("charter_2")
+        as7843_r1, as7843_r2 = self.addRouters("as7843_r1", "as7843_r2")
+        # Linking as7843 (CHARTER) to its router
+        self.addLink(as7843_chi_1_charter, as7843_r1)
+        self.addLink(as7843_ash_1_charter, as7843_r1)
+        self.addLink(as7843_r1, as7843_r2)
+        as7843_r1.addDaemon(OSPF6)
+        as7843_r1.addDaemon(BGP)
+        as7843_r2.addDaemon(OSPF6)
+        as7843_r2.addDaemon(BGP)
+        self.addAS(7843, (as7843_r1, as7843_r2))
+        # Building physical links between as7843 (CHARTER) and OVH
+        self.addLink(as7843_r1, chi_1)
+        self.addLink(as7843_r1, ash_1)
+        self.addLink(as7843_r2, chi_1)
+        self.addLink(as7843_r2, ash_1)
+        ebgp_session(self, as7843_r1, chi_1, link_type=SHARE)
+        #ebgp_session(self, as7843_r1, ash_1, link_type=SHARE)
+        #ebgp_session(self, as7843_r2, chi_1, link_type=SHARE)
+        ebgp_session(self, as7843_r2, ash_1, link_type=SHARE)
+
+        #############################################################
+        #                                                           #
+        #              TRANSIT                                      #
+        #                                                           #
+        #############################################################
+
         # Building AS1299 (TElIA) , routers and links
         as1299_nwk_1_telia = self.addHost("telia_1")
         as1299_nwk_5_telia = self.addHost("telia_2")
