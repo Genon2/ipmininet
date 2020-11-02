@@ -5,7 +5,6 @@ from ipmininet.cli import IPCLI
 from ipmininet.iptopo import IPTopo
 from ipmininet.router.config import BGP, OSPF6, RouterConfig, AF_INET6, set_rr, ebgp_session, SHARE
 
-HOSTS_PER_ROUTER = 2
 
 
 class MyTopology(IPTopo):
@@ -35,30 +34,88 @@ class MyTopology(IPTopo):
         # Building asia's routers abstractly
         asia = self.addRouter("asia")
 
-        # Adding Links  and igp_costs between OVH routers
-        self.addLink(nwk_1,  nwk_5,  igp_cost=1)
-        self.addLink(bhs_g1, bhs_g2, igp_cost=1)
-        self.addLink(ash_1,  ash_5,  igp_cost=1)
-        self.addLink(chi_1,  chi_5,  igp_cost=1)
+        routers = self.routers()
+        prefix = {routers[i]: '2001:01:%04x::/48' % i
+                  for i in range(len(routers))}
+        nwk_1.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[nwk_1],)),))
+        nwk_5.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[nwk_5],)),))
+        bhs_g1.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[bhs_g1],)),))
+        bhs_g2.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[bhs_g2],)),))
+        chi_1.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[chi_1],)),))
+        chi_5.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[chi_5],)),))
+        ash_1.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[ash_1],)),))
+        ash_5.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[ash_5],)),))
+        europe.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[europe],)),))
+        asia.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[asia],)),))
 
-        self.addLink(nwk_1,  bhs_g1, igp_cost=1)
-        self.addLink(nwk_1,  ash_1,  igp_cost=1)
-        self.addLink(nwk_5,  bhs_g2, igp_cost=1)
-        self.addLink(nwk_5,  ash_5,  igp_cost=1)
+        # Adding Links  and igp_costs between OVH routers and ip local adress ipv6
+        las1 = self.addLink(nwk_1,  nwk_5,  igp_cost=1)
+        las1[nwk_1].addParams(ip=("fd00:01::1/64",))
+        las1[nwk_5].addParams(ip=("fd00:01::2/64",))
+        las2 = self.addLink(bhs_g1, bhs_g2, igp_cost=1)
+        las2[bhs_g1].addParams(ip=("fd00:02::1/64",))
+        las2[bhs_g2].addParams(ip=("fd00:02::2/64",))
+        las3 = self.addLink(ash_1,  ash_5,  igp_cost=1)
+        las3[ash_1].addParams(ip=("fd00:03::1/64",))
+        las3[ash_5].addParams(ip=("fd00:03::2/64",))
+        las4 = self.addLink(chi_1,  chi_5,  igp_cost=1)
+        las4[chi_1].addParams(ip=("fd00:04::1/64",))
+        las4[chi_5].addParams(ip=("fd00:04::2/64",))
 
-        self.addLink(chi_1,  bhs_g1, igp_cost=3)
-        self.addLink(chi_1,  ash_1,  igp_cost=3)
-        self.addLink(chi_5,  bhs_g2, igp_cost=3)
-        self.addLink(chi_5,  ash_5,  igp_cost=3)
+        las11 = self.addLink(nwk_1,  bhs_g1, igp_cost=1)
+        las11[nwk_1].addParams(ip=("fd00:01::3/64",))
+        las11[bhs_g1].addParams(ip=("fd00:02::3/64",))
+        las12 = self.addLink(nwk_1,  ash_1,  igp_cost=1)
+        las12[nwk_1].addParams(ip=("fd00:01::4/64",))
+        las12[ash_1].addParams(ip=("fd00:03::3/64",))
+        las13 = self.addLink(nwk_5,  bhs_g2, igp_cost=1)
+        las13[nwk_5].addParams(ip=("fd00:01::5/64",))
+        las13[bhs_g2].addParams(ip=("fd00:02::4/64",))
+        las14 = self.addLink(nwk_5,  ash_5,  igp_cost=1)
+        las14[nwk_5].addParams(ip=("fd00:01::5/64",))
+        las14[ash_5].addParams(ip=("fd00:03::4/64",))
+
+        las41 = self.addLink(chi_1,  bhs_g1, igp_cost=3)
+        las41[chi_1].addParams(ip=("fd00:04::3/64",))
+        las41[bhs_g1].addParams(ip=("fd00:02::5/64",))
+        las42 = self.addLink(chi_1,  ash_1,  igp_cost=3)
+        las42[chi_1].addParams(ip=("fd00:04::4/64",))
+        las42[ash_1].addParams(ip=("fd00:03::5/64",))
+        las43 = self.addLink(chi_5,  bhs_g2, igp_cost=3)
+        las43[chi_5].addParams(ip=("fd00:04::5/64",))
+        las43[bhs_g2].addParams(ip=("fd00:02::6/64",))
+        las44 = self.addLink(chi_5,  ash_5,  igp_cost=3)
+        las44[chi_5].addParams(ip=("fd00:04::6/64",))
+        las44[ash_5].addParams(ip=("fd00:03::6/64",))
         # Connecting US TO EU
-        self.addLink(nwk_1,  europe, igp_cost=30)
-        self.addLink(nwk_5,  europe, igp_cost=30)
+        las15 = self.addLink(nwk_1,  europe, igp_cost=30)
+        las15[nwk_1].addParams(ip=("fd00:01::6/64",))
+        las15[europe].addParams(ip=("fd00:05::3/64",))
+        las16 = self.addLink(nwk_5,  europe, igp_cost=30)
+        las16[nwk_5].addParams(ip=("fd00:01::7/64",))
+        las16[europe].addParams(ip=("fd00:05::4/64",))
         # Connection EU to AS
-        self.addLink(europe, asia,   igp_cost=40)
+        las5 =  self.addLink(europe, asia,   igp_cost=40)
+        las5[europe].addParams(ip=("fd00:05::1/64",))
+        las5[asia].addParams(ip=("fd00:05::2/64",))
         # Connecting US to AS
-        self.addLink(asia,   ash_1,  igp_cost=50)
-        self.addLink(asia,   ash_5,  igp_cost=50)
-        self.addLink(as1_host, nwk_1)  # Host used for tests
+        las51 = self.addLink(asia,   ash_1,  igp_cost=50)
+        las51[ash_1].addParams(ip=("fd00:03::7/64",))
+        las51[asia].addParams(ip=("fd00:05::5/64",))
+        las52 = self.addLink(asia,   ash_5,  igp_cost=50)
+        las52[ash_5].addParams(ip=("fd00:03::8/64",))
+        las52[asia].addParams(ip=("fd00:05::6/64",))
+        las53 = self.addLink(as1_host, nwk_1)  # Host used for tests
 
         # Adding OVH AS
         as16276_routers = [nwk_1, nwk_5, bhs_g1, bhs_g2,
