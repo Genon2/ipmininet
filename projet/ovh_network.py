@@ -21,6 +21,7 @@ class MyTopology(IPTopo):
         # Building OVH Network
         # test routers used for pingall when checking eBGP
         as1_host = self.addHost("as1_host")
+
         # Building New York routers
         nwk_1, nwk_5 = self.addRouters("nwk_1", "nwk_5")
         # Building Bhs routers
@@ -109,13 +110,15 @@ class MyTopology(IPTopo):
         las5[europe].addParams(ip=("fd00:05::1/64",))
         las5[asia].addParams(ip=("fd00:05::2/64",))
         # Connecting US to AS
-        las51 = self.addLink(asia,   ash_1,  igp_cost=50)
-        las51[ash_1].addParams(ip=("fd00:03::7/64",))
+        las51 = self.addLink(asia,   chi_1,  igp_cost=50)
+        las51[chi_1].addParams(ip=("fd00:03::7/64",))
         las51[asia].addParams(ip=("fd00:05::5/64",))
-        las52 = self.addLink(asia,   ash_5,  igp_cost=50)
-        las52[ash_5].addParams(ip=("fd00:03::8/64",))
+        las52 = self.addLink(asia,   chi_5,  igp_cost=50)
+        las52[chi_5].addParams(ip=("fd00:03::8/64",))
         las52[asia].addParams(ip=("fd00:05::6/64",))
         las53 = self.addLink(as1_host, nwk_1)  # Host used for tests
+        las53[as1_host].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
+        las53[nwk_1].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
 
         # Adding OVH AS
         as16276_routers = [nwk_1, nwk_5, bhs_g1, bhs_g2,
@@ -124,7 +127,7 @@ class MyTopology(IPTopo):
         # Adding OSPFv3 and BGP to OVH Network
         for r in as16276_routers:
             r.addDaemon(OSPF6)
-            r.addDaemon(BGP)
+            # r.addDaemon(BGP)
 
         self.addAS(16276, (nwk_1, nwk_5, bhs_g1, bhs_g2,
                            chi_1, chi_5, ash_1, ash_5, europe, asia))
@@ -284,20 +287,19 @@ class MyTopology(IPTopo):
         ebgp_session(self, as3356_r1, nwk_1, link_type=SHARE)
         ebgp_session(self, as3356_r2, chi_1, link_type=SHARE)
 
-        # # Linking AS2 stubs to as2 routers
-        # self.addLink(as2_r1, as2_r2)
-        # self.addLink(as2_ash_1_amazon, as2_r1)
-        # self.addLink(as2_chi_1_charter, as2_r1)
-        # self.addLink(as2_ash_5_amazon, as2_r1)
-        # self.addLink(as2_ash_1_charter, as2_r1)
+        #############################################################
+        #                                                           #
+        #                    Building our CDN                       #
+        #                                                           #
+        #############################################################
 
-        
-
-        # # Adding eBGP sessions between AS2 and OVH Network
-        # ebgp_session(self, as2_r1, chi_1, link_type=SHARE)
-        # ebgp_session(self, as2_r1, nwk_1, link_type=SHARE)
-
-
+        cdn_us_host1 = self.addHost("cdn_host1")
+        cdn_us_link1 = self.addLink(cdn_us_host1, chi_1)
+        cdn_us_link1[cdn_us_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
+        cdn_us_link1[chi_1].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
+        # cdn_us_link1[cdn_us_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
+        # cdn_us_link1[chi_1].addParams(ip=("10.0.3.4/24", "2001:3c::4/64"))
+        # las53 = self.addLink(as1_host, nwk_1)  # Host used for tests
         super().build(*args, **kwargs)
 
 
