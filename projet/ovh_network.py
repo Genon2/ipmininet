@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 from ipmininet.ipnet import IPNet
 from ipmininet.cli import IPCLI
 from ipmininet.iptopo import IPTopo
@@ -129,8 +128,6 @@ class MyTopology(IPTopo):
         las52[chi_5].addParams(ip=("2001:08::3/64",))
         las52[asia].addParams(ip=("2001:10::3/64",))
         las53 = self.addLink(as1_host, nwk_1)  # Host used for tests
-        las53[as1_host].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
-        las53[nwk_1].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
 
         # Adding OVH AS
         as16276_routers = [nwk_1, nwk_5, bhs_g1, bhs_g2,
