@@ -118,14 +118,14 @@ class MyTopology(IPTopo):
         las16[nwk_5].addParams(ip=("2001:06::3/64",))
         las16[europe].addParams(ip=("2001:05::3/64",))
         # Connection EU to AS
-        las5 =  self.addLink(europe, asia,   igp_metric=5)#40
+        las5 =  self.addLink(europe, asia,   igp_metric=40)#40
         las5[europe].addParams(ip=("2001:05::1/64",))
         las5[asia].addParams(ip=("2001:10::1/64",))
         # Connecting US to AS
-        las51 = self.addLink(asia,   chi_1,  igp_metric=50)#50
+        las51 = self.addLink(asia,   chi_1,  igp_metric=30)#50
         las51[chi_1].addParams(ip=("2001:03::4/64",))
         las51[asia].addParams(ip=("2001:10::2/64",))
-        las52 = self.addLink(asia,   chi_5,  igp_metric=50)#50
+        las52 = self.addLink(asia,   chi_5,  igp_metric=30)#50
         las52[chi_5].addParams(ip=("2001:08::3/64",))
         las52[asia].addParams(ip=("2001:10::3/64",))
         las53 = self.addLink(as1_host, nwk_1)  # Host used for tests
@@ -246,12 +246,24 @@ class MyTopology(IPTopo):
         as1299_r1.addDaemon(BGP)
         as1299_r2.addDaemon(OSPF6)
         as1299_r2.addDaemon(BGP)
-        self.addAS(1299, (as1299_r1, as1299_r2))
+
+
+        self.addAS(1299, (as1299_r1, as1299_r2));
+
+
         # Building physical links between AS1299 (TElIA) and OVH
-        self.addLink(as1299_r1, nwk_1)
-        self.addLink(as1299_r1, nwk_5)
-        self.addLink(as1299_r2, chi_5)
-        self.addLink(as1299_r2, ash_5)
+        lok1 = self.addLink(as1299_r1, nwk_1)
+        lok1[as1299_r1].addParams(ip=("2001:13::1/64",))
+        lok1[nwk_1].addParams(ip=("2001:01::5/64",))
+        lok2 = self.addLink(as1299_r1, nwk_5)
+        lok2[as1299_r1].addParams(ip=("2001:13::2/64",))
+        lok2[nwk_5].addParams(ip=("2001:06::5/64",))
+        lok3 = self.addLink(as1299_r2, chi_5)
+        lok3[as1299_r2].addParams(ip=("2001:14::1/64",))
+        lok3[chi_5].addParams(ip=("2001:09::4/64",))
+        lok4 = self.addLink(as1299_r2, ash_5)
+        lok4[as1299_r2].addParams(ip=("2001:14::2/64",))
+        lok4[ash_5].addParams(ip=("2001:08::7/64",))
         # Remarque : ebgp fonctionne avec 3 n'importe lequels mais
         # dès qu'on actve 4 sessions, problème dans les ping. Aucun échange eBGP.
         # host 1 ne sait pas contacter telia et inversement
@@ -280,18 +292,32 @@ class MyTopology(IPTopo):
         self.addLink(as174_ash_5_cogent, as174_r2)
         self.addLink(as174_r1, as174_r2)
         as174_routers = [as174_r1, as174_r2]
-        # Adding OSPF6v3 and BGP to AS174 (Cogent)
+        # Adding OSPFv3 and BGP to AS174 (Cogent)
         for r in as174_routers:
             r.addDaemon(OSPF6)
             r.addDaemon(BGP)
 
         self.addAS(174, (as174_r1, as174_r2))
-        self.addLinks((as174_r1,nwk_1),
-                      (as174_r1,nwk_5),
-                      (as174_r1,chi_1),
-                      (as174_r1,chi_5),
-                      (as174_r2,ash_1),
-                      (as174_r2,ash_5))
+
+
+        lom1 = self.addLink(as174_r1,nwk_1)
+        lom1[as174_r1].addParams(ip=("2001:17::1/64",))
+        lom1[nwk_1].addParams(ip=("2001:01::7/64",))
+        lom2 = self.addLink(as174_r1,nwk_5)
+        lom2[as174_r1].addParams(ip=("2001:17::2/64",))
+        lom2[nwk_5].addParams(ip=("2001:06::7/64",))
+        lom3 = self.addLink(as174_r1,chi_1)
+        lom3[as174_r1].addParams(ip=("2001:17::3/64",))
+        lom3[chi_1].addParams(ip=("2001:04::7/64",))
+        lom4 = self.addLink(as174_r1,chi_5)
+        lom4[as174_r1].addParams(ip=("2001:17::4/64",))
+        lom4[chi_5].addParams(ip=("2001:09::6/64",))
+        lom5 = self.addLink(as174_r2,ash_1)
+        lom5[as174_r2].addParams(ip=("2001:18::1/64",))
+        lom5[ash_1].addParams(ip=("2001:03::7/64",))
+        lom6 = self.addLink(as174_r2,ash_5)
+        lom6[as174_r2].addParams(ip=("2001:18::2/64",))
+        lom6[ash_5].addParams(ip=("2001:08::8/64",))
         # Added an eBGP session for each datacenter region for redundancy
         ebgp_session(self, as174_r1, nwk_1, link_type=SHARE)
         ebgp_session(self, as174_r1, chi_1, link_type=SHARE)
@@ -312,20 +338,30 @@ class MyTopology(IPTopo):
         self.addLink(as3356_chi_5_level3, as3356_r2)
         self.addLink(as3356_r1, as3356_r2)
         as3356_routers = [as3356_r1, as3356_r2]
-        # Adding OSPF6v3 and BGP to AS174 (Cogent)
+        # Adding OSPFv3 and BGP to AS174 (Cogent)
         for r in as3356_routers:
             r.addDaemon(OSPF6)
             r.addDaemon(BGP)
         
         self.addAS(3356, (as3356_r1, as3356_r2))
-        self.addLinks((as3356_r1,nwk_1),
-                      (as3356_r1,nwk_5),
-                      (as3356_r2,chi_1),
-                      (as3356_r2,chi_5))
+
+
+        lou1 = self.addLink(as3356_r1,nwk_1)
+        lou1[as3356_r1].addParams(ip=("2001:15::1/64",))
+        lou1[nwk_1].addParams(ip=("2001:01::6/64",))
+        lou2 = self.addLink(as3356_r1,nwk_5)
+        lou2[as3356_r1].addParams(ip=("2001:15::2/64",))
+        lou2[nwk_5].addParams(ip=("2001:06::6/64",))
+        lou3 = self.addLink(as3356_r2,chi_1)
+        lou3[as3356_r2].addParams(ip=("2001:16::1/64",))
+        lou3[chi_1].addParams(ip=("2001:04::6/64",))
+        lou4 = self.addLink(as3356_r2,chi_5)
+        lou4[as3356_r2].addParams(ip=("2001:16::2/64",))
+        lou4[chi_5].addParams(ip=("2001:09::5/64",))
         # Added an eBGP session for each datacenter region for redundancy
         ebgp_session(self, as3356_r1, nwk_1, link_type=SHARE)
         ebgp_session(self, as3356_r2, chi_1, link_type=SHARE)
-
+        
 
         cdn_us_host1 = self.addHost("cdn_host1")
         cdn_us_link1 = self.addLink(cdn_us_host1, chi_1)
