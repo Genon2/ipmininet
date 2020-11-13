@@ -168,7 +168,7 @@ class MyTopology(IPTopo):
         ma1[as16509_r1].addParams(ip=("2001:13::3/64",))
         ma2 = self.addLink(as16509_ash_5_amazon, as16509_r1)
         ma2[as16509_ash_5_amazon].addParams(ip=("2001:1b::1/64",))
-        ma2[as16509_r2].addParams(ip=("2001:14::3/64",))
+        ma2[as16509_r1].addParams(ip=("2001:14::3/64",))
         ma3 = self.addLink(as16509_r1, as16509_r2)
         ma3[as16509_r1].addParams(ip=("2001:13::4/64",))
         ma3[as16509_r2].addParams(ip=("2001:14::4/64",))
@@ -258,11 +258,22 @@ class MyTopology(IPTopo):
         as1299_r1 = self.addRouter("as1299_r1", lo_addresses=["2045:1::1/64", "13.1.1.1/24"])
         as1299_r2 = self.addRouter("as1299_r2", lo_addresses=["2045:2::1/64", "13.2.1.1/24"])
         # Linking AS1299 (TElIA) to its router
-        self.addLink(as1299_nwk_1_telia, as1299_r1)
-        self.addLink(as1299_nwk_5_telia, as1299_r1)
-        self.addLink(as1299_chi_5_telia, as1299_r2)
-        self.addLink(as1299_ash_5_telia, as1299_r2)
-        self.addLink(as1299_r1, as1299_r2)
+        ta1 = self.addLink(as1299_nwk_1_telia, as1299_r1)
+        ta1[as1299_nwk_1_telia].addParams(ip=("2001:1f::1/64",))
+        ta1[as1299_r1].addParams(ip=("2001:13::3/64",))
+        ta2 = self.addLink(as1299_nwk_5_telia, as1299_r1)
+        ta2[as1299_nwk_5_telia].addParams(ip=("2001:2a::1/64",))
+        ta2[as1299_r1].addParams(ip=("2001:13::4/64",))
+        ta3 = self.addLink(as1299_chi_5_telia, as1299_r2)
+        ta3[as1299_chi_5_telia].addParams(ip=("2001:2b::1/64",))
+        ta3[as1299_r2].addParams(ip=("2001:14::3/64",))
+        ta4 = self.addLink(as1299_ash_5_telia, as1299_r2)
+        ta4[as1299_ash_5_telia].addParams(ip=("2001:2c::1/64",))
+        ta4[as1299_r2].addParams(ip=("2001:14::4/64",))
+        ta5 = self.addLink(as1299_r1, as1299_r2)
+        ta5[as1299_r1].addParams(ip=("2001:13::5/64",))
+        ta5[as1299_r2].addParams(ip=("2001:14::5/64",))
+
         as1299_r1.addDaemon(OSPF6)
         as1299_r1.addDaemon(BGP,
                         address_families=(AF_INET6(networks=("2001:400:1::/48",)),),
@@ -305,13 +316,27 @@ class MyTopology(IPTopo):
         as174_r1 = self.addRouter("as174_r1", lo_addresses=["2046:1::1/64", "14.1.1.1/24"])
         as174_r2 = self.addRouter("as174_r2", lo_addresses=["2046:2::1/64", "14.2.1.1/24"])
         # Added links
-        self.addLink(as174_nwk_1_cogent, as174_r1)
-        self.addLink(as174_nwk_5_cogent, as174_r1)
-        self.addLink(as174_chi_1_cogent, as174_r1)
-        self.addLink(as174_chi_5_cogent, as174_r1)
-        self.addLink(as174_ash_1_cogent, as174_r2)
-        self.addLink(as174_ash_5_cogent, as174_r2)
-        self.addLink(as174_r1, as174_r2)
+        to1 = self.addLink(as174_nwk_1_cogent, as174_r1)
+        to1[as174_nwk_1_cogent].addParams(ip=("2001:2d::1/64",))
+        to1[as174_r1].addParams(ip=("2001:17::5/64",))
+        to2 = self.addLink(as174_nwk_5_cogent, as174_r1)
+        to2[as174_nwk_5_cogent].addParams(ip=("2001:2e::1/64",))
+        to2[as174_r1].addParams(ip=("2001:17::6/64",))
+        to3 = self.addLink(as174_chi_1_cogent, as174_r1)
+        to3[as174_chi_1_cogent].addParams(ip=("2001:2f::1/64",))
+        to3[as174_r1].addParams(ip=("2001:17::7/64",))
+        to4 = self.addLink(as174_chi_5_cogent, as174_r1)
+        to4[as174_chi_5_cogent].addParams(ip=("2001:4a::1/64",))
+        to4[as174_r1].addParams(ip=("2001:17::8/64",))
+        to5 = self.addLink(as174_ash_1_cogent, as174_r2)
+        to5[as174_ash_1_cogent].addParams(ip=("2001:4b::1/64",))
+        to5[as174_r2].addParams(ip=("2001:18::3/64",))
+        to6 = self.addLink(as174_ash_5_cogent, as174_r2)
+        to6[as174_ash_5_cogent].addParams(ip=("2001:4c::1/64",))
+        to6[as174_r2].addParams(ip=("2001:18::4/64",))
+        to7 = self.addLink(as174_r1, as174_r2)
+        to7[as174_r1].addParams(ip=("2001:17::9/64",))
+        to7[as174_r2].addParams(ip=("2001:18::5/64",))
         # as174_routers = [as174_r1, as174_r2]
         # Adding OSPF6v3 and BGP to AS174 (Cogent)
         # for r in as174_routers:
@@ -359,11 +384,21 @@ class MyTopology(IPTopo):
         as3356_r1 = self.addRouter("as3356_r1", lo_addresses=["2047:1::1/64", "15.1.1.1/24"])
         as3356_r2 = self.addRouter("as3356_r2", lo_addresses=["2047:2::1/64", "15.2.1.1/24"])
         # Added links
-        self.addLink(as3356_nwk_5_level3, as3356_r1)
-        self.addLink(as3356_nwk_1_level3, as3356_r1)
-        self.addLink(as3356_chi_1_level3, as3356_r2)
-        self.addLink(as3356_chi_5_level3, as3356_r2)
-        self.addLink(as3356_r1, as3356_r2)
+        ti1 = self.addLink(as3356_nwk_5_level3, as3356_r1)
+        ti1[as3356_nwk_5_level3].addParams(ip=("2001:4d::1/64",))
+        ti1[as3356_r1].addParams(ip=("2001:15::3/64",))
+        ti2 = self.addLink(as3356_nwk_1_level3, as3356_r1)
+        ti2[as3356_nwk_1_level3].addParams(ip=("2001:4f::1/64",))
+        ti2[as3356_r1].addParams(ip=("2001:15::4/64",))
+        ti3 = self.addLink(as3356_chi_1_level3, as3356_r2)
+        ti3[as3356_chi_1_level3].addParams(ip=("2001:5a::1/64",))
+        ti3[as3356_r2].addParams(ip=("2001:16::3/64",))
+        ti4 = self.addLink(as3356_chi_5_level3, as3356_r2)
+        ti4[as3356_chi_5_level3].addParams(ip=("2001:5b::1/64",))
+        ti4[as3356_r2].addParams(ip=("2001:16::4/64",))
+        ti5 = self.addLink(as3356_r1, as3356_r2)
+        ti5[as3356_r1].addParams(ip=("2001:15::5/64",))
+        ti5[as3356_r2].addParams(ip=("2001:16::5/64",))
         as3356_routers = [as3356_r1, as3356_r2]
         # Adding OSPFv3 and BGP to AS174 (Cogent)
         for r in as3356_routers:
@@ -410,24 +445,28 @@ class MyTopology(IPTopo):
         #############################################################
 
 
-        all_routers_blackholling = [nwk_1, nwk_5, bhs_g1, bhs_g2,
-                           chi_1, chi_5, ash_1, ash_5, europe, asia, as16509_r1, as16509_r2,as7843_r1, as7843_r2]
+        # all_routers_blackholling = [nwk_1, nwk_5, bhs_g1, bhs_g2,
+        #                    chi_1, chi_5, ash_1, ash_5, europe, asia, as16509_r1, as16509_r2,as7843_r1, as7843_r2]
         
-        all_routers = [nwk_1, nwk_5, bhs_g1, bhs_g2,chi_1, chi_5, ash_1, ash_5, europe, asia, as16276_routers,as16509_r1,as16509_r2,as7843_r1,as7843_r2]
+        # all_routers = [nwk_1, nwk_5, bhs_g1, bhs_g2,chi_1, chi_5, ash_1, ash_5, europe, asia, as16276_routers,as16509_r1,as16509_r2,as7843_r1,as7843_r2]
 
-        all_routers_north_america = [nwk_1, nwk_5, bhs_g1, bhs_g2,chi_1, chi_5, ash_1, ash_5,as16509_r1,as16509_r2,as7843_r1,as7843_r2]
+        # all_routers_north_america = [nwk_1, nwk_5, bhs_g1, bhs_g2,chi_1, chi_5, ash_1, ash_5,as16509_r1,as16509_r2,as7843_r1,as7843_r2]
 
-        peers_link = CommunityList(name='blackholling', community=666,
-                                   action='deny')
+        # peers_link = CommunityList(name='blackholling', community=666,
+        #                            action='deny')
 
-        all_routers_ = AccessList('all', ('any',)) # Access list
-
-        for r in all_routers_north_america:
-            r.get_config(BGP).set_community('16276:50', to_peer=all_routers, matching=(all_routers_,))
+        # all_routers_ = AccessList('all', ('any',)) # Access list
 
         
-        for r in all_routers:
-            r.get_config(BGP).deny(name='blackholling', to_peer=all_routers_north_america, matching=peers_link, order=1)
+        # for r in all_routers_north_america:
+        #     black_holling(r)
+
+        # for r in all_routers_north_america:
+        #     r.get_config(BGP).set_community('16276:50', to_peer=all_routers, matching=(all_routers_,))
+
+        
+        # for r in all_routers:
+        #     r.get_config(BGP).deny(name='blackholling', to_peer=all_routers_north_america, matching=peers_link, order=1)
 
 
         # # Linking AS2 stubs to as2 routers
@@ -445,6 +484,35 @@ class MyTopology(IPTopo):
 
 
         super().build(*args, **kwargs)
+
+def black_holling(topo: 'IPTopo', a: 'RouterDescription', b: 'RouterDescription'):
+   
+    all_al = AccessList('All', ('any',))
+    # Create the community filter for the export policy
+    peers_link = CommunityList(name='from-peers', community=1, action='permit')
+    up_link = CommunityList(name='from-up', community=3, action='permit')
+
+    # Set the community and local pref for the import policy
+    a.get_config(BGP)\
+        .set_community(1, from_peer=b, matching=(all_al,)) \
+        .set_local_pref(150, from_peer=b, matching=(all_al,))
+
+    # Create route maps to filter exported route
+    a.get_config(BGP)\
+        .deny('export-to-peer-' + b, to_peer=b, matching=(up_link,),
+                order=10)\
+        .deny('export-to-peer-' + b, to_peer=b, matching=(peers_link,),
+                order=15)\
+        .permit('export-to-peer-' + b, to_peer=b, order=20)
+
+   
+    bgp_peering(topo, a, b)
+    topo.linkInfo(a, b)['igp_passive'] = True
+
+def bgp_peering(topo: 'IPTopo', a: str, b: str):
+    """Register a BGP peering between two nodes"""
+    topo.getNodeInfo(a, 'bgp_peers', list).append(b)
+    topo.getNodeInfo(b, 'bgp_peers', list).append(a)
 
 
 # Press the green button to run the script.
