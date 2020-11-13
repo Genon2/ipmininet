@@ -3,7 +3,7 @@
 from ipmininet.ipnet import IPNet
 from ipmininet.cli import IPCLI
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import BGP, OSPF6, RouterConfig, AF_INET6, set_rr, ebgp_session, SHARE, OSPF6, RouterConfig, AccessList
+from ipmininet.router.config import BGP, OSPF6, RouterConfig, AF_INET6, set_rr, ebgp_session, SHARE, OSPF6, RouterConfig, AccessList, CommunityList
 
 
 class MyTopology(IPTopo):
@@ -37,9 +37,6 @@ class MyTopology(IPTopo):
         # Building asia's routers abstractly
         asia = self.addRouter("asia", lo_addresses=["2042:2::1/64", "10.2.1.1/24"])
 
-        all_al = AccessList('all', ('any',)) # Access list
-        
-        #myRouter.get_config(BGP).set_community('16276:50', to_peer=myRouter2, matching=(all_al,))
         
         routers = self.routers()
         prefix = {routers[i]: '2001:100:%04x::/48' % i
@@ -57,7 +54,7 @@ class MyTopology(IPTopo):
                         address_families=(AF_INET6(networks=(prefix[bhs_g2],)),),
                         routerid='1.1.1.4')
         chi_1.addDaemon(BGP,
-                        address_families=(AF_INET6(networks=(prefix[chi_1],)),),
+                        address_families=(AF_INET6(networks=(prefix[chi_1],('2001:3c::/64'))),),
                         routerid='1.1.1.5')
         chi_5.addDaemon(BGP,
                         address_families=(AF_INET6(networks=(prefix[chi_5],)),),
@@ -166,9 +163,15 @@ class MyTopology(IPTopo):
         as16509_r1 = self.addRouter("as16509_r1", lo_addresses=["2043:1::1/64", "11.1.1.1/24"])
         as16509_r2 = self.addRouter("as16509_r2", lo_addresses=["2043:2::1/64", "11.2.1.1/24"])
         # Linking AS16509 (AMAZON) to its router
-        self.addLink(as16509_ash_1_amazon, as16509_r1)
-        self.addLink(as16509_ash_5_amazon, as16509_r1)
-        self.addLink(as16509_r1, as16509_r2)
+        ma1 = self.addLink(as16509_ash_1_amazon, as16509_r1)
+        ma1[as16509_ash_1_amazon].addParams(ip=("2001:1a::1/64",))
+        ma1[as16509_r1].addParams(ip=("2001:13::3/64",))
+        ma2 = self.addLink(as16509_ash_5_amazon, as16509_r1)
+        ma2[as16509_ash_5_amazon].addParams(ip=("2001:1b::1/64",))
+        ma2[as16509_r2].addParams(ip=("2001:14::3/64",))
+        ma3 = self.addLink(as16509_r1, as16509_r2)
+        ma3[as16509_r1].addParams(ip=("2001:13::4/64",))
+        ma3[as16509_r2].addParams(ip=("2001:14::4/64",))
         as16509_r1.addDaemon(OSPF6)
         as16509_r1.addDaemon(BGP,
                         address_families=(AF_INET6(networks=("2001:200:1::/48",)),),
@@ -204,9 +207,15 @@ class MyTopology(IPTopo):
         as7843_r1 = self.addRouter("as7843_r1", lo_addresses=["2044:1::1/64", "12.1.1.1/24"])
         as7843_r2 = self.addRouter("as7843_r2", lo_addresses=["2044:2::1/64", "12.2.1.1/24"])
         # Linking as7843 (CHARTER) to its router
-        self.addLink(as7843_chi_1_charter, as7843_r1)
-        self.addLink(as7843_ash_1_charter, as7843_r1)
-        self.addLink(as7843_r1, as7843_r2)
+        mo1 = self.addLink(as7843_chi_1_charter, as7843_r1)
+        mo1[as7843_chi_1_charter].addParams(ip=("2001:1c::1/64",))
+        mo1[as7843_r1].addParams(ip=("2001:11::3/64",))
+        mo2 = self.addLink(as7843_ash_1_charter, as7843_r1)
+        mo2[as7843_ash_1_charter].addParams(ip=("2001:1d::1/64",))
+        mo2[as7843_r1].addParams(ip=("2001:11::4/64",))
+        mo3 = self.addLink(as7843_r1, as7843_r2)
+        mo3[as7843_r1].addParams(ip=("2001:11::5/64",))
+        mo3[as7843_r2].addParams(ip=("2001:11::3/64",))
         as7843_r1.addDaemon(OSPF6)
         as7843_r1.addDaemon(BGP,
                         address_families=(AF_INET6(networks=("2001:300:1::/48",)),),
@@ -391,6 +400,36 @@ class MyTopology(IPTopo):
         cdn_us_link1 = self.addLink(cdn_us_host1, chi_1)
         cdn_us_link1[cdn_us_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
         cdn_us_link1[chi_1].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
+
+
+
+        #############################################################
+        #                                                           #
+        #              BGP COMMUNITY                                #
+        #                                                           #
+        #############################################################
+
+
+        all_routers_blackholling = [nwk_1, nwk_5, bhs_g1, bhs_g2,
+                           chi_1, chi_5, ash_1, ash_5, europe, asia, as16509_r1, as16509_r2,as7843_r1, as7843_r2]
+        
+        all_routers = [nwk_1, nwk_5, bhs_g1, bhs_g2,chi_1, chi_5, ash_1, ash_5, europe, asia, as16276_routers,as16509_r1,as16509_r2,as7843_r1,as7843_r2]
+
+        all_routers_north_america = [nwk_1, nwk_5, bhs_g1, bhs_g2,chi_1, chi_5, ash_1, ash_5,as16509_r1,as16509_r2,as7843_r1,as7843_r2]
+
+        peers_link = CommunityList(name='blackholling', community=666,
+                                   action='deny')
+
+        all_routers_ = AccessList('all', ('any',)) # Access list
+
+        for r in all_routers_north_america:
+            r.get_config(BGP).set_community('16276:50', to_peer=all_routers, matching=(all_routers_,))
+
+        
+        for r in all_routers:
+            r.get_config(BGP).deny(name='blackholling', to_peer=all_routers_north_america, matching=peers_link, order=1)
+
+
         # # Linking AS2 stubs to as2 routers
         # self.addLink(as2_r1, as2_r2)
         # self.addLink(as2_ash_1_amazon, as2_r1)
