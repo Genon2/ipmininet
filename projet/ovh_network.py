@@ -3,7 +3,7 @@
 from ipmininet.ipnet import IPNet
 from ipmininet.cli import IPCLI
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import BGP, OSPF6, RouterConfig, AF_INET6, set_rr, ebgp_session, SHARE, OSPF6, RouterConfig
+from ipmininet.router.config import BGP, OSPF6, RouterConfig, AF_INET6, set_rr, ebgp_session, SHARE, OSPF6, RouterConfig, AccessList
 
 
 class MyTopology(IPTopo):
@@ -37,6 +37,10 @@ class MyTopology(IPTopo):
         # Building asia's routers abstractly
         asia = self.addRouter("asia", lo_addresses=["2042:2::1/64", "10.2.1.1/24"])
 
+        all_al = AccessList('all', ('any',)) # Access list
+        
+        #myRouter.get_config(BGP).set_community('16276:50', to_peer=myRouter2, matching=(all_al,))
+        
         routers = self.routers()
         prefix = {routers[i]: '2001:100:%04x::/48' % i
                   for i in range(len(routers))}
@@ -118,7 +122,7 @@ class MyTopology(IPTopo):
         las16[nwk_5].addParams(ip=("2001:06::3/64",))
         las16[europe].addParams(ip=("2001:05::3/64",))
         # Connection EU to AS
-        las5 =  self.addLink(europe, asia,   igp_metric=40)#40
+        las5 =  self.addLink(europe, asia,   igp_metric=5)#40
         las5[europe].addParams(ip=("2001:05::1/64",))
         las5[asia].addParams(ip=("2001:10::1/64",))
         # Connecting US to AS
@@ -166,9 +170,13 @@ class MyTopology(IPTopo):
         self.addLink(as16509_ash_5_amazon, as16509_r1)
         self.addLink(as16509_r1, as16509_r2)
         as16509_r1.addDaemon(OSPF6)
-        as16509_r1.addDaemon(BGP)
+        as16509_r1.addDaemon(BGP,
+                        address_families=(AF_INET6(networks=("2001:200:1::/48",)),),
+                        routerid='1.2.1.1')
         as16509_r2.addDaemon(OSPF6)
-        as16509_r2.addDaemon(BGP)
+        as16509_r2.addDaemon(BGP,
+                        address_families=(AF_INET6(networks=("2001:200:2::/48",)),),
+                        routerid='1.2.1.2')
         self.addAS(16509, (as16509_r1, as16509_r2))
         # Building physical links between AS16509 (AMAZON) and OVH
         lam1 = self.addLink(as16509_r1, ash_1)
@@ -200,9 +208,13 @@ class MyTopology(IPTopo):
         self.addLink(as7843_ash_1_charter, as7843_r1)
         self.addLink(as7843_r1, as7843_r2)
         as7843_r1.addDaemon(OSPF6)
-        as7843_r1.addDaemon(BGP)
+        as7843_r1.addDaemon(BGP,
+                        address_families=(AF_INET6(networks=("2001:300:1::/48",)),),
+                        routerid='1.3.1.1')
         as7843_r2.addDaemon(OSPF6)
-        as7843_r2.addDaemon(BGP)
+        as7843_r2.addDaemon(BGP,
+                        address_families=(AF_INET6(networks=("2001:300:2::/48",)),),
+                        routerid='1.3.1.2')
         self.addAS(7843, (as7843_r1, as7843_r2))
         # Building physical links between as7843 (CHARTER) and OVH
         lach1 = self.addLink(as7843_r1, chi_1)
@@ -341,7 +353,13 @@ class MyTopology(IPTopo):
         # Adding OSPFv3 and BGP to AS174 (Cogent)
         for r in as3356_routers:
             r.addDaemon(OSPF6)
-            r.addDaemon(BGP)
+        as3356_r1.addDaemon(BGP,
+                        address_families=(AF_INET6(networks=("2001:600:1::/48",)),),
+                        routerid='1.6.1.1')
+        as3356_r2.addDaemon(BGP,
+                        address_families=(AF_INET6(networks=("2001:600:2::/48",)),),
+                        routerid='1.6.1.2')
+        
         
         self.addAS(3356, (as3356_r1, as3356_r2))
 
