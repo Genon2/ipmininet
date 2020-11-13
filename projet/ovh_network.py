@@ -256,11 +256,11 @@ class MyTopology(IPTopo):
         self.addLink(as1299_r1, as1299_r2)
         as1299_r1.addDaemon(OSPF6)
         as1299_r1.addDaemon(BGP,
-                        address_families=(AF_INET6(networks=(prefix[asia],)),),
+                        address_families=(AF_INET6(networks=("2001:400:1::/48",)),),
                         routerid='1.4.1.1')
         as1299_r2.addDaemon(OSPF6)
         as1299_r2.addDaemon(BGP,
-                        address_families=(AF_INET6(networks=(prefix[asia],)),),
+                        address_families=(AF_INET6(networks=("2001:400:2::/48",)),),
                         routerid='1.4.1.2')
         self.addAS(1299, (as1299_r1, as1299_r2))
         # Building physical links between AS1299 (TElIA) and OVH
@@ -308,11 +308,11 @@ class MyTopology(IPTopo):
         # for r in as174_routers:
         as174_r1.addDaemon(OSPF6)
         as174_r1.addDaemon(BGP,
-                    address_families=(AF_INET6(networks=(prefix[asia],)),),
+                    address_families=(AF_INET6(networks=("2001:500:1::/48",)),),
                     routerid='1.5.1.1')
         as174_r2.addDaemon(OSPF6)
         as174_r2.addDaemon(BGP,
-                    address_families=(AF_INET6(networks=(prefix[asia],)),),
+                    address_families=(AF_INET6(networks=("2001:500:2::/48",)),),
                     routerid='1.5.1.2')
 
         self.addAS(174, (as174_r1, as174_r2))
