@@ -41,7 +41,7 @@ class MyTopology(IPTopo):
         prefix = {routers[i]: '2001:100:%04x::/48' % i
                   for i in range(len(routers))}
         nwk_1.addDaemon(BGP,
-                        address_families=(AF_INET6(networks=(prefix[nwk_1],)),),
+                        address_families=(AF_INET6(networks=(prefix[nwk_1],('2001:3c::/64'))),),
                         routerid='1.1.1.1')
         nwk_5.addDaemon(BGP,
                         address_families=(AF_INET6(networks=(prefix[nwk_5],)),),
@@ -66,10 +66,10 @@ class MyTopology(IPTopo):
                         routerid='1.1.1.8')
         europe.addDaemon(BGP,
                         address_families=(AF_INET6(networks=(prefix[europe],)),),
-                        routerid='1.1.1.9')
+                        routerid='1.1.2.9')
         asia.addDaemon(BGP,
                         address_families=(AF_INET6(networks=(prefix[asia],)),),
-                        routerid='1.1.1.10')
+                        routerid='1.1.3.10')
 
         # Adding Links  and igp_metrics between OVH routers and ip local adress ipv6
         las1 = self.addLink(nwk_1,  nwk_5)
@@ -122,10 +122,10 @@ class MyTopology(IPTopo):
         las5[europe].addParams(ip=("2001:05::1/64",))
         las5[asia].addParams(ip=("2001:10::1/64",))
         # Connecting US to AS
-        las51 = self.addLink(asia,   chi_1,  igp_metric=50)#50
+        las51 = self.addLink(asia,   chi_1,  igp_metric=30)#50
         las51[chi_1].addParams(ip=("2001:03::4/64",))
         las51[asia].addParams(ip=("2001:10::2/64",))
-        las52 = self.addLink(asia,   chi_5,  igp_metric=50)#50
+        las52 = self.addLink(asia,   chi_5,  igp_metric=30)#50
         las52[chi_5].addParams(ip=("2001:08::3/64",))
         las52[asia].addParams(ip=("2001:10::3/64",))
         las53 = self.addLink(as1_host, nwk_1)  # Host used for tests
@@ -243,9 +243,13 @@ class MyTopology(IPTopo):
         self.addLink(as1299_ash_5_telia, as1299_r2)
         self.addLink(as1299_r1, as1299_r2)
         as1299_r1.addDaemon(OSPF6)
-        as1299_r1.addDaemon(BGP)
+        as1299_r1.addDaemon(BGP,
+                        address_families=(AF_INET6(networks=(prefix[asia],)),),
+                        routerid='1.4.1.1')
         as1299_r2.addDaemon(OSPF6)
-        as1299_r2.addDaemon(BGP)
+        as1299_r2.addDaemon(BGP,
+                        address_families=(AF_INET6(networks=(prefix[asia],)),),
+                        routerid='1.4.1.2')
         self.addAS(1299, (as1299_r1, as1299_r2))
         # Building physical links between AS1299 (TElIA) and OVH
         self.addLink(as1299_r1, nwk_1)
@@ -279,11 +283,17 @@ class MyTopology(IPTopo):
         self.addLink(as174_ash_1_cogent, as174_r2)
         self.addLink(as174_ash_5_cogent, as174_r2)
         self.addLink(as174_r1, as174_r2)
-        as174_routers = [as174_r1, as174_r2]
+        # as174_routers = [as174_r1, as174_r2]
         # Adding OSPF6v3 and BGP to AS174 (Cogent)
-        for r in as174_routers:
-            r.addDaemon(OSPF6)
-            r.addDaemon(BGP)
+        # for r in as174_routers:
+        as174_r1.addDaemon(OSPF6)
+        as174_r1.addDaemon(BGP,
+                    address_families=(AF_INET6(networks=(prefix[asia],)),),
+                    routerid='1.5.1.1')
+        as174_r2.addDaemon(OSPF6)
+        as174_r2.addDaemon(BGP,
+                    address_families=(AF_INET6(networks=(prefix[asia],)),),
+                    routerid='1.5.1.2')
 
         self.addAS(174, (as174_r1, as174_r2))
         self.addLinks((as174_r1,nwk_1),
