@@ -65,10 +65,10 @@ class MyTopology(IPTopo):
                         address_families=(AF_INET6(networks=(prefix[ash_5],)),),
                         routerid='1.1.1.8')
         europe.addDaemon(BGP,
-                        address_families=(AF_INET6(networks=(prefix[europe],)),),
+                        address_families=(AF_INET6(networks=(prefix[europe],('2001:3c::/64'))),),
                         routerid='1.1.2.9')
         asia.addDaemon(BGP,
-                        address_families=(AF_INET6(networks=(prefix[asia],)),),
+                        address_families=(AF_INET6(networks=(prefix[asia],('2001:3c::/64'))),),
                         routerid='1.1.3.10')
 
         # Adding Links  and igp_metrics between OVH routers and ip local adress ipv6
@@ -465,21 +465,21 @@ class MyTopology(IPTopo):
             for r in as16276_routers:
                 r.get_config(BGP).set_community(5, to_peer=s, matching=(all_al,))
 
-        # SET CDN
+         # SET CDN
         cdn_europe_host1 = self.addHost("cdn_host1")
         cdn_europe_link1 = self.addLink(cdn_europe_host1, europe)
-        cdn_europe_link1[cdn_europe_host1].addParams(ip4=("10.0.3.2/24"), ip6=("2001:3c::2/64"))
-        cdn_europe_link1[europe].addParams(ip4=("10.0.3.4/24"), ip6=("2001:3c::4/64"))
+        cdn_europe_link1[cdn_europe_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
+        cdn_europe_link1[europe].addParams(ip=("10.0.3.4/24", "2001:3c::4/64"))
 
         cdn_asia_host1 = self.addHost("cdn_host3")
         cdn_asia_link1 = self.addLink(cdn_asia_host1, asia)
-        cdn_asia_link1[cdn_asia_host1].addParams(ip4=("10.0.3.2/24"), ip6=("2001:3c::2/64"))
-        cdn_asia_link1[asia].addParams(ip4=("10.0.3.3/24"), ip6=("2001:3c::3/64"))
+        cdn_asia_link1[cdn_asia_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
+        cdn_asia_link1[asia].addParams(ip=("10.0.3.3/24", "2001:3c::3/64"))
 
         cdn_nwk_1_host1 = self.addHost("cdn_host5")
         cdn_nwk_1_link1 = self.addLink(cdn_nwk_1_host1, nwk_1) 
-        cdn_nwk_1_link1[cdn_nwk_1_host1].addParams(ip4=("10.0.3.2/24""2001:3c::2/64"))
-        cdn_nwk_1_link1[nwk_1].addParams(ip4=("10.0.3.1/24"), ip6=("2001:3c::1/64"))
+        cdn_nwk_1_link1[cdn_nwk_1_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
+        cdn_nwk_1_link1[nwk_1].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
 
         # cdn_us_host1 = self.addHost("cdn_host6")
         # cdn_us_link1 = self.addLink(cdn_us_host1, chi_1)
