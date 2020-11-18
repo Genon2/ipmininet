@@ -19,7 +19,6 @@ class MyTopology(IPTopo):
 
         # Building OVH Network
         # test routers used for pingall when checking eBGP
-        as1_host = self.addHost("as1_host")
         # Building New York routers
         nwk_1 = self.addRouter("nwk_1", lo_addresses=["2042:8::1/64", "10.8.1.1/24"])
         nwk_5 = self.addRouter("nwk_5", lo_addresses=["2042:9::1/64", "10.9.1.1/24"])
@@ -37,9 +36,6 @@ class MyTopology(IPTopo):
         # Building asia's routers abstractly
         asia = self.addRouter("asia", lo_addresses=["2042:2::1/64", "10.2.1.1/24"])
 
-        all_al = AccessList('all', ('any',)) # Access list
-        
-        #myRouter.get_config(BGP).set_community('16276:50', to_peer=myRouter2, matching=(all_al,))
         
         routers = self.routers()
         prefix = {routers[i]: '2001:100:%04x::/48' % i
@@ -122,19 +118,16 @@ class MyTopology(IPTopo):
         las16[nwk_5].addParams(ip6=("2001:06::3/64",))
         las16[europe].addParams(ip6=("2001:05::3/64",))
         # Connection EU to AS
-        las5 =  self.addLink(europe, asia,   igp_metric=5)#40
+        las5 =  self.addLink(europe, asia,   igp_metric=40)#40
         las5[europe].addParams(ip6=("2001:05::1/64",))
         las5[asia].addParams(ip6=("2001:10::1/64",))
         # Connecting US to AS
-        las51 = self.addLink(asia,   chi_1,  igp_metric=30)#50
+        las51 = self.addLink(asia,   chi_1,  igp_metric=50)#50
         las51[chi_1].addParams(ip6=("2001:03::4/64",))
         las51[asia].addParams(ip6=("2001:10::2/64",))
-        las52 = self.addLink(asia,   chi_5,  igp_metric=30)#50
+        las52 = self.addLink(asia,   chi_5,  igp_metric=50)#50
         las52[chi_5].addParams(ip6=("2001:09::30/64",))
         las52[asia].addParams(ip6=("2001:10::3/64",))
-        las53 = self.addLink(as1_host, nwk_1)  # Host used for tests
-        las53[as1_host].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
-        las53[nwk_1].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
 
         # Adding OVH AS
         as16276_routers = [nwk_1, nwk_5, bhs_g1, bhs_g2,
@@ -176,11 +169,15 @@ class MyTopology(IPTopo):
         ma3[as16509_r1].addParams(ip6=("2001:13::4/64",))
         ma3[as16509_r2].addParams(ip6=("2001:14::4/64",))
 
-        as16509_r1.addDaemon(OSPF6)
+
+        as16509_routers = [as16509_r1, as16509_r2]
+        # Adding OSPF6v3 and BGP to AS174 (Cogent)
+        for r in as16509_routers:
+            r.addDaemon(OSPF6)
+
         as16509_r1.addDaemon(BGP,
                         address_families=(AF_INET6(networks=("2001:200:1::/48",)),),
                         routerid='1.2.1.1')
-        as16509_r2.addDaemon(OSPF6)
         as16509_r2.addDaemon(BGP,
                         address_families=(AF_INET6(networks=("2001:200:2::/48",)),),
                         routerid='1.2.1.2')
@@ -221,12 +218,14 @@ class MyTopology(IPTopo):
         mo3[as7843_r1].addParams(ip6=("2001:11::5/64",))
         mo3[as7843_r2].addParams(ip6=("2001:80::1/64",))
 
+        as7843_routers = [as7843_r1, as7843_r2]
+        # Adding OSPF6v3 and BGP to AS174 (Cogent)
+        for r in as7843_routers:
+            r.addDaemon(OSPF6)
 
-        as7843_r1.addDaemon(OSPF6)
         as7843_r1.addDaemon(BGP,
                         address_families=(AF_INET6(networks=("2001:300:1::/48",)),),
                         routerid='1.3.1.1')
-        as7843_r2.addDaemon(OSPF6)
         as7843_r2.addDaemon(BGP,
                         address_families=(AF_INET6(networks=("2001:300:2::/48",)),),
                         routerid='1.3.1.2')
@@ -280,6 +279,10 @@ class MyTopology(IPTopo):
         ta5[as1299_r1].addParams(ip6=("2001:70::5/64",))
         ta5[as1299_r2].addParams(ip6=("2001:71::5/64",))
 
+        as1299_routers = [as1299_r1, as1299_r2]
+        # Adding OSPF6v3 and BGP to AS174 (Cogent)
+        for r in as1299_routers:
+            r.addDaemon(OSPF6)
         as1299_r1.addDaemon(OSPF6)
         as1299_r1.addDaemon(BGP,
                         address_families=(AF_INET6(networks=("2001:400:1::/48",)),),
@@ -343,14 +346,13 @@ class MyTopology(IPTopo):
         to7 = self.addLink(as174_r1, as174_r2)
         to7[as174_r1].addParams(ip6=("2001:17::9/64",))
         to7[as174_r2].addParams(ip6=("2001:18::5/64",))
-        # as174_routers = [as174_r1, as174_r2]
+        as174_routers = [as174_r1, as174_r2]
         # Adding OSPF6v3 and BGP to AS174 (Cogent)
-        # for r in as174_routers:
-        as174_r1.addDaemon(OSPF6)
+        for r in as174_routers:
+            r.addDaemon(OSPF6)
         as174_r1.addDaemon(BGP,
                     address_families=(AF_INET6(networks=("2001:500:1::/48",)),),
                     routerid='1.5.1.1')
-        as174_r2.addDaemon(OSPF6)
         as174_r2.addDaemon(BGP,
                     address_families=(AF_INET6(networks=("2001:500:2::/48",)),),
                     routerid='1.5.1.2')
@@ -438,10 +440,55 @@ class MyTopology(IPTopo):
         ebgp_session(self, as3356_r2, chi_1, link_type=SHARE)
         
 
-        cdn_us_host1 = self.addHost("cdn_host1")
-        cdn_us_link1 = self.addLink(cdn_us_host1, chi_1)
-        cdn_us_link1[cdn_us_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
-        cdn_us_link1[chi_1].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
+        all_al = AccessList('all', ('any',))  # Access list
+
+        # SET MED
+        nwk_1.get_config(BGP).set_med(50,  to_peer=as174_r1, matching=(all_al, ))
+        chi_5.get_config(BGP).set_med(100, to_peer=as174_r1, matching=(all_al, ))
+        chi_1.get_config(BGP).set_med(100, to_peer=as174_r1, matching=(all_al, ))
+        
+        # SET BGP COMMUNITY
+        for s in as3356_routers: # level3 routers
+            for r in as16276_routers:
+                r.get_config(BGP).set_community(1, to_peer=s, matching=(all_al,))
+
+        for s in as174_routers:# cogent routers
+            for r in as16276_routers:
+                r.get_config(BGP).set_community(2, to_peer=s, matching=(all_al,))
+        
+        for s in as1299_routers:# telia routers
+            for r in as16276_routers:
+                r.get_config(BGP).set_community(3, to_peer=s, matching=(all_al,))
+        
+        for s in as7843_routers:# charter routers
+            for r in as16276_routers:
+                r.get_config(BGP).set_community(4, to_peer=s, matching=(all_al,))
+
+        for s in as16509_routers:  # amazon routers
+            for r in as16276_routers:
+                r.get_config(BGP).set_community(5, to_peer=s, matching=(all_al,))
+
+        # SET CDN
+        cdn_europe_host1 = self.addHost("cdn_host1")
+        cdn_europe_link1 = self.addLink(cdn_europe_host1, europe)
+        cdn_europe_link1[cdn_europe_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
+        cdn_europe_link1[europe].addParams(ip=("10.0.3.4/24", "2001:3c::4/64"))
+
+        cdn_asia_host1 = self.addHost("cdn_host3")
+        cdn_asia_link1 = self.addLink(cdn_asia_host1, asia)
+        cdn_asia_link1[cdn_asia_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
+        cdn_asia_link1[asia].addParams(ip=("10.0.3.3/24", "2001:3c::3/64"))
+
+        cdn_nwk_1_host1 = self.addHost("cdn_host5")
+        cdn_nwk_1_link1 = self.addLink(cdn_nwk_1_host1, nwk_1) 
+        cdn_nwk_1_link1[cdn_nwk_1_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
+        cdn_nwk_1_link1[nwk_1].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
+
+        # cdn_us_host1 = self.addHost("cdn_host6")
+        # cdn_us_link1 = self.addLink(cdn_us_host1, chi_1)
+        # cdn_us_link1[cdn_us_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
+        # cdn_us_link1[chi_1].addParams(ip=("10.0.3.60/24", "2001:3c::60/64"))
+
         # # Linking AS2 stubs to as2 routers
         # self.addLink(as2_r1, as2_r2)
         # self.addLink(as2_ash_1_amazon, as2_r1)
