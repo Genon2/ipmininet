@@ -434,46 +434,46 @@ class MyTopology(IPTopo):
         
         # SET BGP COMMUNITY
         as16276_routers = [nwk_1, nwk_5, bhs_g1, bhs_g2, chi_1, chi_5, ash_1, ash_5]
-        for s in as16509_routers: # amazon routers
-            europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
-            asia.get_config(BGP).set_community(8, to_peer=s, matching=(all_al,))
-            for r in as16276_routers:
-                s.get_config(BGP).set_community(5, to_peer=r, matching=(all_al,))
         for s in as7843_routers: # charter routers
-            europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
-            asia.get_config(BGP).set_community(8, to_peer=s, matching=(all_al,))
+            europe.get_config(BGP).set_community(4, to_peer=s, matching=(all_al,))
+            asia.get_config(BGP).set_community(5, to_peer=s, matching=(all_al,))
             for r in as16276_routers:
-                s.get_config(BGP).set_community(4, to_peer=r, matching=(all_al,))
-
-        for s in as1299_routers: # telia routers
-            europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
-            asia.get_config(BGP).set_community(8, to_peer=s, matching=(all_al,))
+                s.get_config(BGP).set_community(21, to_peer=r, matching=(all_al,))
+        for s in as16509_routers: # amazon routers
+            europe.get_config(BGP).set_community(4, to_peer=s, matching=(all_al,))
+            asia.get_config(BGP).set_community(5, to_peer=s, matching=(all_al,))
             for r in as16276_routers:
-                s.get_config(BGP).set_community(3, to_peer=r, matching=(all_al,))
-        for s in as174_routers: # cogent routers
-            europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
-            asia.get_config(BGP).set_community(8, to_peer=s, matching=(all_al,))
-            for r in as16276_routers:
-                s.get_config(BGP).set_community(2, to_peer=r, matching=(all_al,))
+                s.get_config(BGP).set_community(22, to_peer=r, matching=(all_al,))
+       
         for s in as3356_routers: # level3 routers
-            europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
-            asia.get_config(BGP).set_community(8, to_peer=s, matching=(all_al,))
+            europe.get_config(BGP).set_community(4, to_peer=s, matching=(all_al,))
+            asia.get_config(BGP).set_community(5, to_peer=s, matching=(all_al,))
             for r in as16276_routers:
-                s.get_config(BGP).set_community(1, to_peer=r, matching=(all_al,))
+                s.get_config(BGP).set_community(11, to_peer=r, matching=(all_al,))
+        for s in as174_routers: # cogent routers
+            europe.get_config(BGP).set_community(4, to_peer=s, matching=(all_al,))
+            asia.get_config(BGP).set_community(5, to_peer=s, matching=(all_al,))
+            for r in as16276_routers:
+                s.get_config(BGP).set_community(12, to_peer=r, matching=(all_al,))
+        for s in as1299_routers: # telia routers
+            europe.get_config(BGP).set_community(4, to_peer=s, matching=(all_al,))
+            asia.get_config(BGP).set_community(5, to_peer=s, matching=(all_al,))
+            for r in as16276_routers:
+                s.get_config(BGP).set_community(13, to_peer=r, matching=(all_al,))
 
         for s in as16276_routers:  # OVH north america routers
-            s.get_config(BGP).set_community(6, to_peer=europe, matching=(all_al,))
-            s.get_config(BGP).set_community(6, to_peer=asia, matching=(all_al,))
+            s.get_config(BGP).set_community(3, to_peer=europe, matching=(all_al,))
+            s.get_config(BGP).set_community(3, to_peer=asia, matching=(all_al,))
             for r in as16509_routers:# amazon routers
-                s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
+                s.get_config(BGP).set_community(3, to_peer=r, matching=(all_al,))
             for r in as7843_routers:# charter routers
-                s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
+                s.get_config(BGP).set_community(3, to_peer=r, matching=(all_al,))
             for r in as1299_routers:# telia routers
-                s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
+                s.get_config(BGP).set_community(3, to_peer=r, matching=(all_al,))
             for r in as174_routers:# cogent routers
-                s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
+                s.get_config(BGP).set_community(3, to_peer=r, matching=(all_al,))
             for r in as3356_routers:# level3 routers
-                s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
+                s.get_config(BGP).set_community(3, to_peer=r, matching=(all_al,))
             
          # SET CDN
         cdn_europe_host1 = self.addHost("cdn_host1")
