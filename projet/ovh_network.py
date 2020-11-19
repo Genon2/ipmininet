@@ -445,25 +445,56 @@ class MyTopology(IPTopo):
         chi_1.get_config(BGP).set_med(100, to_peer=as174_r1, matching=(all_al, ))
         
         # SET BGP COMMUNITY
+
+       
+        
+        as16276_routers = [nwk_1, nwk_5, bhs_g1, bhs_g2, chi_1, chi_5, ash_1, ash_5]
+        for s in as16509_routers: # amazon routers
+            europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
+            asia.get_config(BGP).set_community(8, to_peer=s, matching=(all_al,))
+            for r in as16276_routers:
+                s.get_config(BGP).set_community(5, to_peer=r, matching=(all_al,))
+        for s in as7843_routers: # charter routers
+            europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
+            asia.get_config(BGP).set_community(8, to_peer=s, matching=(all_al,))
+            for r in as16276_routers:
+                s.get_config(BGP).set_community(4, to_peer=r, matching=(all_al,))
+
+        for s in as1299_routers: # telia routers
+            europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
+            asia.get_config(BGP).set_community(8, to_peer=s, matching=(all_al,))
+            for r in as16276_routers:
+                s.get_config(BGP).set_community(3, to_peer=r, matching=(all_al,))
+        for s in as174_routers: # cogent routers
+            europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
+            asia.get_config(BGP).set_community(8, to_peer=s, matching=(all_al,))
+            for r in as16276_routers:
+                s.get_config(BGP).set_community(2, to_peer=r, matching=(all_al,))
         for s in as3356_routers: # level3 routers
+            europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
+            asia.get_config(BGP).set_community(8, to_peer=s, matching=(all_al,))
             for r in as16276_routers:
-                r.get_config(BGP).set_community(1, to_peer=s, matching=(all_al,))
+                s.get_config(BGP).set_community(1, to_peer=r, matching=(all_al,))
 
-        for s in as174_routers:# cogent routers
-            for r in as16276_routers:
-                r.get_config(BGP).set_community(2, to_peer=s, matching=(all_al,))
-        
-        for s in as1299_routers:# telia routers
-            for r in as16276_routers:
-                r.get_config(BGP).set_community(3, to_peer=s, matching=(all_al,))
-        
-        for s in as7843_routers:# charter routers
-            for r in as16276_routers:
-                r.get_config(BGP).set_community(4, to_peer=s, matching=(all_al,))
+        for s in as16276_routers:  # OVH north america routers
+            s.get_config(BGP).set_community(6, to_peer=europe, matching=(all_al,))
+            s.get_config(BGP).set_community(6, to_peer=asia, matching=(all_al,))
+            for r in as16509_routers:# amazon routers
+                s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
+            for r in as7843_routers:# charter routers
+                s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
+            for r in as1299_routers:# telia routers
+                s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
+            for r in as174_routers:# cogent routers
+                s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
+            for r in as3356_routers:# level3 routers
+                s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
+            
 
-        for s in as16509_routers:  # amazon routers
-            for r in as16276_routers:
-                r.get_config(BGP).set_community(5, to_peer=s, matching=(all_al,))
+        # stub_transit_routers = [as16509_routers, as7843_routers, as1299_routers, as174_routers, as3356_routers]
+        
+        # europe.get_config(BGP).set_community(7, to_peer=stub_transit_routers, matching=(all_al,))
+        # asia.get_config(BGP).set_community(8, to_peer=stub_transit_routers, matching=(all_al,))
 
          # SET CDN
         cdn_europe_host1 = self.addHost("cdn_host1")
@@ -481,55 +512,7 @@ class MyTopology(IPTopo):
         cdn_nwk_1_link1[cdn_nwk_1_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
         cdn_nwk_1_link1[nwk_1].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
 
-        # cdn_us_host1 = self.addHost("cdn_host6")
-        # cdn_us_link1 = self.addLink(cdn_us_host1, chi_1)
-        # cdn_us_link1[cdn_us_host1].addParams(ip4=("10.0.3.2/24", "2001:3c::2/64"))
-        # cdn_us_link1[chi_1].addParams(ip4=("10.0.3.60/24", "2001:3c::60/64"))
-
-        # # Linking AS2 stubs to as2 routers
-        # self.addLink(as2_r1, as2_r2)
-        # self.addLink(as2_ash_1_amazon, as2_r1)
-        # self.addLink(as2_chi_1_charter, as2_r1)
-        # self.addLink(as2_ash_5_amazon, as2_r1)
-        # self.addLink(as2_ash_1_charter, as2_r1)
-
-        
-
-        # # Adding eBGP sessions between AS2 and OVH Network
-        # ebgp_session(self, as2_r1, chi_1, link_type=SHARE)
-        # ebgp_session(self, as2_r1, nwk_1, link_type=SHARE)
-
-
         super().build(*args, **kwargs)
-
-def black_holling(topo: 'IPTopo', a: 'RouterDescription', b: 'RouterDescription'):
-   
-    all_al = AccessList('All', ('any',))
-    # Create the community filter for the export policy
-    peers_link = CommunityList(name='from-peers', community=1, action='permit')
-    up_link = CommunityList(name='from-up', community=3, action='permit')
-
-    # Set the community and local pref for the import policy
-    a.get_config(BGP)\
-        .set_community(1, from_peer=b, matching=(all_al,)) \
-        .set_local_pref(150, from_peer=b, matching=(all_al,))
-
-    # Create route maps to filter exported route
-    a.get_config(BGP)\
-        .deny('export-to-peer-' + b, to_peer=b, matching=(up_link,),
-                order=10)\
-        .deny('export-to-peer-' + b, to_peer=b, matching=(peers_link,),
-                order=15)\
-        .permit('export-to-peer-' + b, to_peer=b, order=20)
-
-   
-    bgp_peering(topo, a, b)
-    topo.linkInfo(a, b)['igp_passive'] = True
-
-def bgp_peering(topo: 'IPTopo', a: str, b: str):
-    """Register a BGP peering between two nodes"""
-    topo.getNodeInfo(a, 'bgp_peers', list).append(b)
-    topo.getNodeInfo(b, 'bgp_peers', list).append(a)
 
 
 # Press the green button to run the script.
