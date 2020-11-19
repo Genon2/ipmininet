@@ -10,13 +10,6 @@ class MyTopology(IPTopo):
 
     def build(self, *args, **kwargs):
 
-        # # Adding stubs to AS2 and building AS2 routers
-        # as2_chi_1_charter = self.addHost("charter_1")
-        # as2_ash_1_charter = self.addHost("charter_2")
-        # as2_ash_1_amazon = self.addHost("amazon_1")
-        # as2_ash_5_amazon = self.addHost("amazon_2")
-        # # Two routers needed to build an AS
-
         # Building OVH Network
         # test routers used for pingall when checking eBGP
         # Building New York routers
@@ -197,9 +190,7 @@ class MyTopology(IPTopo):
         lam4[as16509_r2].addParams(ip4=("192.168.13.3/24"), ip6=("2001:14::2/64",))
         lam4[ash_5].addParams(ip4=("192.168.5.4/24"), ip6=("2001:08::6/64",))
         ebgp_session(self, as16509_r1, ash_1, link_type=SHARE)
-        #ebgp_session(self, as16509_r1, ash_5, link_type=SHARE)
         ebgp_session(self, as16509_r2, ash_1, link_type=SHARE)
-        #ebgp_session(self, as16509_r2, ash_5, link_type=SHARE)
 
 
         # Building as7843 (CHARTER) , routers and links
@@ -245,8 +236,6 @@ class MyTopology(IPTopo):
         lach4[as7843_r2].addParams(ip4=("192.168.17.2/24"),ip6=("2001:80::3/64",))
         lach4[ash_1].addParams(ip4=("192.168.4.6/24"), ip6=("2001:03::6/64",))
         ebgp_session(self, as7843_r1, chi_1, link_type=SHARE)
-        #ebgp_session(self, as7843_r1, ash_1, link_type=SHARE)
-        #ebgp_session(self, as7843_r2, chi_1, link_type=SHARE)
         ebgp_session(self, as7843_r2, ash_1, link_type=SHARE)
 
         #############################################################
@@ -309,7 +298,6 @@ class MyTopology(IPTopo):
         # host 1 ne sait pas contacter telia et inversement
         # Je commente un nwk_5 car il y a dejà une session eBGP avec nwk_1
         ebgp_session(self, as1299_r1, nwk_1, link_type=SHARE)
-        # ebgp_session(self, as1299_r1, nwk_5, link_type=SHARE)
         ebgp_session(self, as1299_r2, chi_5, link_type=SHARE)
         ebgp_session(self, as1299_r2, ash_5, link_type=SHARE)
 
@@ -445,9 +433,6 @@ class MyTopology(IPTopo):
         chi_1.get_config(BGP).set_med(100, to_peer=as174_r1, matching=(all_al, ))
         
         # SET BGP COMMUNITY
-
-       
-        
         as16276_routers = [nwk_1, nwk_5, bhs_g1, bhs_g2, chi_1, chi_5, ash_1, ash_5]
         for s in as16509_routers: # amazon routers
             europe.get_config(BGP).set_community(7, to_peer=s, matching=(all_al,))
@@ -490,12 +475,6 @@ class MyTopology(IPTopo):
             for r in as3356_routers:# level3 routers
                 s.get_config(BGP).set_community(6, to_peer=r, matching=(all_al,))
             
-
-        # stub_transit_routers = [as16509_routers, as7843_routers, as1299_routers, as174_routers, as3356_routers]
-        
-        # europe.get_config(BGP).set_community(7, to_peer=stub_transit_routers, matching=(all_al,))
-        # asia.get_config(BGP).set_community(8, to_peer=stub_transit_routers, matching=(all_al,))
-
          # SET CDN
         cdn_europe_host1 = self.addHost("cdn_host1")
         cdn_europe_link1 = self.addLink(cdn_europe_host1, europe)
