@@ -476,19 +476,22 @@ class MyTopology(IPTopo):
                 s.get_config(BGP).set_community(3, to_peer=r, matching=(all_al,))
             
          # SET CDN
-        cdn_europe_host1 = self.addHost("cdn_host1")
+        cdn_europe_host1 = self.addRouter("cdn_host1", lo_addresses=["10.0.3.2/24", "2001:3c::2/64"])
+        cdn_europe_host1.addDaemon(BGP)
+        cdn_europe_host1.addDaemon(OSPF6)
         cdn_europe_link1 = self.addLink(cdn_europe_host1, europe)
-        cdn_europe_link1[cdn_europe_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
         cdn_europe_link1[europe].addParams(ip=("10.0.3.4/24", "2001:3c::4/64"))
 
-        cdn_asia_host1 = self.addHost("cdn_host3")
+        cdn_asia_host1 = self.addRouter("cdn_host3", lo_addresses=["10.0.3.2/24", "2001:3c::2/64"])
+        cdn_asia_host1.addDaemon(BGP)
+        cdn_asia_host1.addDaemon(OSPF6)
         cdn_asia_link1 = self.addLink(cdn_asia_host1, asia)
-        cdn_asia_link1[cdn_asia_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
         cdn_asia_link1[asia].addParams(ip=("10.0.3.3/24", "2001:3c::3/64"))
 
-        cdn_nwk_1_host1 = self.addHost("cdn_host5")
+        cdn_nwk_1_host1 = self.addRouter("cdn_host5", lo_addresses=["10.0.3.2/24", "2001:3c::2/64"])
+        cdn_nwk_1_host1.addDaemon(BGP)
+        cdn_nwk_1_host1.addDaemon(OSPF6)
         cdn_nwk_1_link1 = self.addLink(cdn_nwk_1_host1, nwk_1) 
-        cdn_nwk_1_link1[cdn_nwk_1_host1].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
         cdn_nwk_1_link1[nwk_1].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
 
         super().build(*args, **kwargs)
