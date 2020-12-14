@@ -520,8 +520,8 @@ class Peer:
             path_cost, i = heapq.heappop(prio_queue)
             if i in visited:
                 continue
-            i = to_visit.pop(i)
             visited.add(i)
+            i = to_visit.pop(i)
             for n in i.broadcast_domain.routers:
                 if n.node.name == peer:
                     if not v6:

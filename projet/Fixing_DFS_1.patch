@@ -1,0 +1,26 @@
+Index: ipmininet/router/config/bgp.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ipmininet/router/config/bgp.py	(revision d023674248d790744162d02707ff1d17467756eb)
++++ ipmininet/router/config/bgp.py	(date 1605198634554)
+@@ -510,7 +510,7 @@
+             -> Tuple[Optional[str], Optional['Router']]:
+         """Return the IP address that base should try to contact to establish
+         a peering"""
+-        visited = set()  # type: Set[IPIntf]
++        visited = set()  # type: Set[str]
+         to_visit = {i.name: i for i in realIntfList(base)}
+         prio_queue = [(0, i) for i in to_visit.keys()]
+         heapq.heapify(prio_queue)
+@@ -520,8 +520,8 @@
+             path_cost, i = heapq.heappop(prio_queue)
+             if i in visited:
+                 continue
+-            i = to_visit.pop(i)
+             visited.add(i)
++            i = to_visit.pop(i)
+             for n in i.broadcast_domain.routers:
+                 if n.node.name == peer:
+                     if not v6:
