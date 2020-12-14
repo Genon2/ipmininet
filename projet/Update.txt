@@ -1,0 +1,10 @@
+Report:
+- We have made several changes thanks to the reviews in our report for ip addressing. 
+- We have added diagrams for a better visualization of our network. 
+- We have added a better explanation of the protocols used by anycast in the report as well as a traceroute screenshot for our anycast system explaining the behavior of the chicago router with the AS174. 
+ - We have also added a section to explain the fact that we didn't use a backup link but instead, we opted to use load balancing. 
+ - We also added explanations about more concrete scenarios on our BGP communities. 
+
+code :
+- we modified our anycast system by adding loopback addresses on routers instead of hosts.
+- add new variables for the ip prefix in according to our ip configuration plan.
